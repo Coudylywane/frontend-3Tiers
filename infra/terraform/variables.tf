@@ -13,7 +13,7 @@ variable "environment" {
 variable "aws_region" {
   description = "AWS region for regional resources."
   type        = string
-  default     = "eu-west-3"
+  default     = "eu-west-1"
 }
 
 variable "bucket_name" {
