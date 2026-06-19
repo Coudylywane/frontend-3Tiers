@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import './App.css'
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8080'
@@ -18,10 +18,6 @@ function App() {
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
 
-  const editingTask = useMemo(
-    () => tasks.find((task) => task.id === editingId) ?? null,
-    [editingId, tasks],
-  )
   const submitLabel = editingId ? 'Mettre à jour' : 'Ajouter'
   const listState = (() => {
     if (loading) return 'loading'
@@ -29,7 +25,7 @@ function App() {
     return 'ready'
   })()
 
-  const loadTasks = async () => {
+  const loadTasks = useCallback(async () => {
     setLoading(true)
     setError('')
     try {
@@ -44,20 +40,15 @@ function App() {
     } finally {
       setLoading(false)
     }
-  }
-
-  useEffect(() => {
-    loadTasks()
   }, [])
 
   useEffect(() => {
-    if (!editingTask) return
-    setForm({
-      title: editingTask.title ?? '',
-      description: editingTask.description ?? '',
-      done: Boolean(editingTask.done),
-    })
-  }, [editingTask])
+    const timeoutId = window.setTimeout(() => {
+      loadTasks()
+    }, 0)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [loadTasks])
 
   const resetForm = () => {
     setForm(EMPTY_FORM)
